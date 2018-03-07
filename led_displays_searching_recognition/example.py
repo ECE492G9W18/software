@@ -2,13 +2,13 @@ import cv2
 from led import LedDisplaysRecognizer
 
 if __name__ == '__main__':
-    cam = cv2.VideoCapture('buff_test_video_01.mpeg')
+    #cam = cv2.VideoCapture('buff_test_video_01.mpeg')
     led_displays_recognizer = LedDisplaysRecognizer()
 
     while True:
-        ret, frame = cam.read()
-        assert ret == True
-
+        #ret, frame = cam.read()
+        #assert ret == True
+        frame = cv2.imread("test/test_03.png")
         # Select region of interest (roi)
         h, w, _ = frame.shape
         rh = int(round(h * 0.2))
@@ -19,7 +19,8 @@ if __name__ == '__main__':
         roi_x1 = w - rw
         cv2.rectangle(frame, (roi_x0, roi_y0), (roi_x1, roi_y1), (0, 255, 0), 2)
 
-        result = led_displays_recognizer.process(frame[roi_y0:roi_y1, roi_x0:roi_x1, :])
+        #result = led_displays_recognizer.process(frame[roi_y0:roi_y1, roi_x0:roi_x1, :])
+        result = led_displays_recognizer.process(frame)
         if result != None:
             digits, x0, x1, y0, y1 = result
             x0 += rw
