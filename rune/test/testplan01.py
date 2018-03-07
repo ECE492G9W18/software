@@ -14,6 +14,7 @@ class Test(unittest.TestCase):
 
         recognizer = numberRecognizer(model_dir="../model/model.ckpt")
         self.assertEqual(recognizer.predict(test_data)[0][0],1)
+        print(recognizer.predict(test_data))
     
 if __name__ == '__main__':
     unittest.main()
