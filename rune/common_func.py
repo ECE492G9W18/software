@@ -9,7 +9,7 @@ draw_number_color = (100, 230, 0)
 
 def sort_box_points(box):
     """
-    This function will sort box points in TL->BL->BR->TR order
+    This function will sort box points in BL->TL->TR->BR order
     params box: 4 points of the box
         type: 2d np.array
     return out: 4 sorted points of the box

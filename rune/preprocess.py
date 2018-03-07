@@ -28,7 +28,6 @@ This function get rid of redundancy number boxes
 def cell_redundancy_removal(contours, rects, number_boxes):
     bad_box_indexs = list()
     dist_toleration = 10
-
     for rect_i in range(len(rects)):
         if rect_i not in bad_box_indexs:
             for rect_j in range(rect_i+1, len(rects)):
