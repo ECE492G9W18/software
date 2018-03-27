@@ -58,7 +58,7 @@ def decode_src_and_feed_preprocessing(video_src, fps=24, src_type='image'):
         last_frame = frame.copy()
 
         activate_rune(frame) # perform the algorithm
-        resize = cv2.resize(frame, (1024, 960))
+        resize = cv2.resize(frame, (640, 480))
         cv2.imshow("rune activation visualize", resize)
         key = cv2.waitKey(wait_key_time) & 0xFF
     return
