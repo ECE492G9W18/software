@@ -5,7 +5,7 @@ import sys, os, numpy as np
 import scipy
 from common_func import *
 from manual_labelling import try_open_video_file
-from mnist_deep_estimator import numberRecognizer
+from mnist_model import numberRecognizer
 from prediction_selection import predExtractor
 
 
@@ -301,18 +301,18 @@ def number_recognizing_prediction(src, pred_data, boxes, recognizer):
     # print duplicates_num
     # post_extractor.number_redundancy_removal2()
 
-    if perplexity > 0.25:
-        post_extractor.dump_preds()
+#if perplexity > 0.25:
+    #post_extractor.dump_preds()
 
     # print prediction
     if perplexity <= 0.25:
-        # post_extractor.number_redundancy_removal2()
+        post_extractor.number_redundancy_removal2()
         if len(boxes)<10:
             post_extractor.number_redundancy_removal3()
 
         # print post_extractor.find_missed_number()
 
-        post_extractor.draw_pred(src)
+    post_extractor.draw_pred(src)
 
     # print prediction
     # print probabilities

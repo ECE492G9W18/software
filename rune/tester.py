@@ -5,7 +5,7 @@ import sys, os, numpy as np
 import scipy
 from common_func import *
 from manual_labelling import try_open_video_file
-from mnist_deep_estimator import numberRecognizer
+from mnist_model import numberRecognizer
 from prediction_selection import predExtractor
 from preprocess import *
 
@@ -22,7 +22,7 @@ def activate_rune(src):
     # handwritten number recognition
     if len(boxes)>1:
         pred_data, human= number_recognizing_preparation(gray, rects, boxes)
-        cv2.imshow("cells", human)
+        #cv2.imshow("cells", human)
         predictions = number_recognizing_prediction(src, pred_data, boxes, recognizer)
     # digit tube searching
     # digit tube recognition

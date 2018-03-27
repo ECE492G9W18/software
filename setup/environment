@@ -1,0 +1,97 @@
+#Created by: Yiding Fan 03/08/2018
+#this is the commands flow to setting up opencv and tensorflow on the De1_soc step-by-step
+#and it takes days
+
+#start
+sudo apt-get update
+sudo apt-get upgrade
+#opencv
+sudo apt-get install build-essential git cmake pkg-config
+sudo apt-get install libjpeg8-dev libtiff4-dev libjasper-dev libpng12-dev
+
+sudo apt-get install libavcodec-dev  libavformat-dev libswscale-dev
+sudo apt-get install libgtk2.0-dev
+
+sudo apt-get install libatlas-base-dev
+
+cd ~
+git clone https://github.com/Itseez/opencv.git
+cd opencv
+git checkout 3.0.0
+
+cd ~
+git clone https://github.com/Itseez/opencv_contrib.git
+cd opencv_contrib
+git checkout 3.0.0
+
+sudo apt-get install python2.7-dev
+wget https://bootstrap.pypa.io/get-pip.py
+sudo python get-pip.py
+pip install numpy
+
+cd ~/opencv
+mkdir build
+cd build
+cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D INSTALL_C_EXAMPLES=ON -D INSTALL_PYTHON_EXAMPLES=ON \
+-D OPENCV_EXTRA_MODULES_PATH=~/opencv_contrib/modules -D BUILD_EXAMPLES=ON ..
+
+make -j2
+
+sudo make install
+sudo ldconfig
+
+#tensorflow
+sudo apt-get install zip g++ zlib1g-dev unzip
+sudo apt-get install gcc-4.8 g++-4.8 swig
+sudo apt-get install libjpeg-dev libgif-dev
+
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 100
+sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 100
+
+#tensorflow memory drive as Swap for compiling
+#assume there is a driver named xxx in /dev in linux-swap format using uuid:xxxxxxxx-xxxx-xxxxxxxx
+sudo umount /dev/xxx
+sudo mkswap /dev/xxx
+sudo nano /etc/fstab
+#add "UUID=XXXXXXXX-XXXX-XXXXXXXXX none swap sw,pri=5 0 0" at the end of /etc/fstab
+sudo swapon -a
+
+mkdir tf
+cd tf
+
+#bazel compiler for tensorflow
+wget https://github.com/bazel/releases/download/0.5.4/bazel-0.5.4-dist.zip
+unzip -d bazel bazel-0.5.4-dist.zip
+
+cd bazel
+sudo nano scripts/bootstrap/compile.sh
+#add -J-Xmx500M at the end of line 117
+sudo nano tools/cpp/cc_configure.bzl
+#change the return value of get_cpu_value into "arm"
+
+sudo ./compile.sh
+#4 hour later
+
+sudo cp output/bazel /usr/local/bin/bazel
+
+
+
+
+cd ..
+git clone --recurse-submodules https://github.com/tensorflow/tensorflow.git
+cd tensorflow
+git checkout v1.5.0
+
+#replace all
+grep -Rl 'lib64' |xargs sed -i 's/lib64/lib/g'
+
+./configure
+
+#chose all no for (Y/n) except jemalloc
+#don't try to change --local_resources 1024,1.0,1.0 if you dont have a strong cpu, multiple cores and memory
+bazel build -c opt --copt="mfpu=neon-vfpv4" --copt="-funsafe-math-optimizations" --copt="-ftree-vectorize" --copt="-fomit-frame-pointer" --local_resources 1024,1.0,1.0 --verbose_failures tensorflow/tools/pip_pakage:build_pip_package
+#6 hours later
+bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg
+
+#installation
+sudo pip install /tmp/tensorflow_pkg/tensorflow-1.5.0-cp27-none-linux_armv7l.whl
