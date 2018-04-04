@@ -155,8 +155,8 @@ def grid_searching_preprocess(src):
 
     img = normalize(img)
 
-    img = cv2.Canny(img, 400, 200, apertureSize=3, L2gradient=True) # find edges
-
+    img = cv2.Canny(img, 200, 200, apertureSize=3, L2gradient=True) # find edges
+    #cv2.imshow("test",img)
     img = cv2.dilate(img, np.ones((3,3),np.uint8), iterations=3)    # enlarge edges
 
     """
@@ -253,8 +253,11 @@ def number_recognizing_cell_preprocess(src):
     img = normalize(img * (mask**10))
 
     # data preparation
-    feed_data = img.reshape((1, src.shape[0] * src.shape[1])) / 255.
-
+    feed_data = img.reshape((1, src.shape[0] * src.shape[1]))
+    
+    ret,feed_data=cv2.threshold(feed_data, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+    feed_data=feed_data/ 255.
+    
     return feed_data, img
 
 
@@ -300,15 +303,16 @@ def number_recognizing_prediction(src, pred_data, boxes, recognizer):
     # print "duplicates_num:"
     # print duplicates_num
     # post_extractor.number_redundancy_removal2()
-
-#if perplexity > 0.25:
-    #post_extractor.dump_preds()
+    #if perplexity > 0.25:
+    #   post_extractor.dump_preds()
 
     # print prediction
     if perplexity <= 0.25:
         post_extractor.number_redundancy_removal2()
         if len(boxes)<10:
             post_extractor.number_redundancy_removal3()
+#if len(boxes)==9:
+#post_extractor.test_function()
 
         # print post_extractor.find_missed_number()
 

@@ -19,6 +19,9 @@ def activate_rune(src):
     # grid searching
     pre, gray = grid_searching_preprocess(src.copy())
     rects, boxes = grid_searching(src, pre, gray)
+    #if (len(rects)>0 and len(boxes)>0):
+        #  print("rects:",rects)
+        #  print("boxes:",boxes)
     # handwritten number recognition
     if len(boxes)>1:
         pred_data, human= number_recognizing_preparation(gray, rects, boxes)
@@ -41,6 +44,8 @@ def decode_src_and_feed_preprocessing(video_src, fps=24, src_type='image'):
 
     # loop to read each frame
     last_frame = None
+    cv2.namedWindow("rune activation visualize")
+    cv2.moveWindow("rune activation visualize", 40,30)
     while True:
         ret, frame = video_src.read()
         if not ret or key==ord('q'):
