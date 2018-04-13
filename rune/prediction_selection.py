@@ -223,6 +223,36 @@ class predExtractor:
         normed2 = np.dot(normed.reshape((-1,1)), normed.reshape((1,-1)))
         correlation = matrix2 / normed2
         return correlation
+    def test_function(self):
+        new=np.argmax(self.probs,axis=0)[1:]
+        if len(np.unique(new))==len(self.preds):
+            for i in range(8):
+                self.preds[new[i]]=i+1
+        else:
+            to_do=[0,1,2,3,4,5,6,7,8]
+            ans=[0,0,0,0,0,0,0,0,0]
+            while(len(to_do)!=0):
+                temp=np.argmax(self.probs[to_do[0]])
+                if(temp not in ans):
+                    ans[to_do[0]]=temp
+                    del to_do[0]
+                else:
+                    index=to_do[0]
+                    t_index=ans.index(temp)
+                    t_temp=np.argmax(self.probs[t_index])
+                    self.probs[index].sort()
+                    origin_sec=self.probs[index][-3]
+                    self.probs[t_index].sort()
+                    to_sec=self.probs[t_index][-3]
+                    if self.probs[index][temp]>self.probs[t_index][t_temp]:
+                        ans[t_index]=0
+                        ans[index]=temp
+                        del to_do[0]
+                        to_do.append(t_index)
+                    else:
+                        ans[index]=np.where(self.probs[index]==origin_sec)[0][0]
+                        del to_do[0]
+            self.preds=np.array(ans)
 
     def draw_pred(self, target_img):
         """
