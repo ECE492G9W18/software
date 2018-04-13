@@ -3,6 +3,7 @@ import cv2
 import argparse
 import sys, os, numpy as np
 import scipy
+import subprocess
 from common_func import *
 from manual_labelling import try_open_video_file
 from mnist_model import numberRecognizer
@@ -13,7 +14,23 @@ from preprocess import *
 DEBUG = True
 recognizer = numberRecognizer()
 
-
+pre_result=""
+def getKey(item):
+    return item[1]
+def find_top(boxes):
+    sth=[]
+    while(len(sth)<3):
+        m=min(boxes,key=getKey)
+        sth.append(m)
+        boxes.remove(m)
+    return sth
+def find_second(boxes):
+    sth=[]
+    while(len(sth)<3):
+        m=min(boxes,key=getKey)
+        sth.append(m)
+        boxes.remove(m)
+    return sth
 def activate_rune(src):
     predictions = None
     # grid searching
@@ -27,9 +44,37 @@ def activate_rune(src):
     # digit tube searching
     # digit tube recognition
     # prompt light
+    if len(boxes)==9:
+        sendresult(predictions,rects)
     return predictions, rects
-
-
+def sendresult(pre,boxes):
+    global pre_result
+    i=0
+    bs=[]
+    for box in boxes:
+        ind=box[0]
+        bs.append((ind[0],ind[1],pre[i]))
+        i=i+1
+    s=""
+    top=find_top(bs)
+    second=find_second(bs)
+    remain=bs
+    top=sorted(top)
+    second=sorted(second)
+    remain=sorted(remain)
+    for t in top:
+        s=s+str(t[2])
+    for se in second:
+        s=s+str(se[2])
+    for r in remain:
+        s=s+str(r[2])
+    print("sorted%s\n"%s)
+    if s==pre_result:
+        cmd="http://192.168.1.6:5000/%s"%s
+        subprocess.call(["curl","-X","POST",cmd])
+        print(s)
+    else:
+        pre_result=s
 
 def decode_src_and_feed_preprocessing(video_src, fps=24, src_type='image'):
     # set up option variables
